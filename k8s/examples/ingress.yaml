@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nutanix-move-repo
+  namespace: nutanix-move-repo
+  labels:
+    app.kubernetes.io/name: nutanix-move-repo
+  annotations:
+    # Option A: automatic cert via cert-manager (remove if using a manual secret)
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    # Option B: manual TLS secret - apply tls-secret.yaml first, then remove the
+    #           cert-manager annotation above. The secretName below is the same either way.
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    # Optional: IP whitelist middleware (create separately)
+    # traefik.ingress.kubernetes.io/router.middlewares: nutanix-move-repo-ipwhitelist@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - secretName: nutanix-move-repo-tls
+      hosts:
+        - move-repo.example.com   # <-- change to your hostname
+  rules:
+    - host: move-repo.example.com  # <-- change to your hostname
+      http:
+        paths:
+          - path: /resources/
+            pathType: Prefix
+            backend:
+              service:
+                name: nutanix-move-repo
+                port:
+                  number: 80

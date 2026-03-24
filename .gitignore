@@ -1,0 +1,6 @@
+# TLS certificates - never commit private keys
+certs/
+
+# Populated tls-secret.yaml with real certs - never commit
+# (the example file without actual certs is safe to commit)
+k8s/examples/tls-secret-populated.yaml
